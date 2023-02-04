@@ -8,7 +8,27 @@
     <script src="./growwx-checkout-test.js"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   </head>
+  <style>
+    .button-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .large-button {
+      padding: 20px 40px;
+      font-size: 30px;
+      background-color: skyblue;
+      color: white;
+      border: none;
+      border-radius: 10px;
+    }
+
+  </style>
   <body>
-    <button onclick="triggerCheckout()">Click Me</button>
+    <div class="button-container">
+      <button class="large-button" onclick="triggerCheckout()">Checkout With GrowwX</button>
+    </div>
   </body>
 </html>
