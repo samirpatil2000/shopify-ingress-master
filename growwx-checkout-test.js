@@ -70,7 +70,7 @@ function newPayload8_5() {
 }
 
 function getIframeUrl() {
-  const NGROK = "https://ef4a-175-100-183-105.ngrok.io"
+  const NGROK = "https://purple-points-tie-175-100-183-105.loca.lt"
   const LOCALHOST = "http://localhost:3000"
-  return NGROK + "/?payload=" + getPayload1();
+  return LOCALHOST + "/?payload=" + getPayload1();
 }
