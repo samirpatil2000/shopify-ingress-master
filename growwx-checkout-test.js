@@ -105,7 +105,7 @@ function checkoutOnSpinBot(){
 
 function getIframeUrl(payload, gamma) {
   // const PROD_MASTER = "https://master.d1x4zgp7l0n0ny.amplifyapp.com"
-  const DEVELOPMENT = "https://development.dsa2svnq8e9eh.amplifyapp.com"
+  const DEVELOPMENT = "https://development.dsa2svnq8e9eh.amplifyapp.com" // this is pointing to gamma
   // const GAMMA = "https://dev-shahaab.d1x4zgp7l0n0ny.amplifyapp.com"
   const LOCALHOST = "http://localhost:3000"
   var HOST = LOCALHOST;
