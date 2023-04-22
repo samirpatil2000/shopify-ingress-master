@@ -1,33 +1,81 @@
 function triggerCheckout(payload, gamma) {
+  var growwxContainer = document.createElement("div");
+  growwxContainer.id = "growwx-container";
+  growwxContainer.style.width = "100%";
+  growwxContainer.style.height = "100%";
+  growwxContainer.style.position = "fixed";
+  growwxContainer.style.display = "block";
+  growwxContainer.style.top = "0px";
+  growwxContainer.style.left = "0px";
+  growwxContainer.style.zIndex = "2147483647";
+
+
+  var ifrmContainer = document.createElement("iframe");
+  ifrmContainer.id = "growwx-iframeContainer";
   var ifrm = document.createElement("iframe");
   ifrm.id = "growwx-iframe";
   ifrm.setAttribute("src", getIframeUrl(payload, gamma));
   if (isMobile()) {
     console.log("Mobile");
+    ifrmContainer.style.width = "100%";
+    ifrmContainer.style.height = "100vh";
+    ifrmContainer.style.top = "0px";
+    ifrmContainer.style.left = "0px";
+    ifrmContainer.style.zIndex = "9999";
+    ifrmContainer.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
+    ifrmContainer.allowFullscreen = true;
+    ifrmContainer.style.border = "none";
     ifrm.style.width = "100%";
     ifrm.style.height = "100%";
     ifrm.style.border = "none";
+    ifrm.style.position = "relative";
+    ifrm.style.display = "block";
+    ifrm.style.zIndex = "9999999999";
+  } else {
+    ifrmContainer.style.width = "100%";
+    ifrmContainer.style.height = "100vh";
+    ifrmContainer.style.top = "0px";
+    ifrmContainer.style.left = "0px";
+    ifrmContainer.style.zIndex = "9999";
+    ifrmContainer.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
+    ifrmContainer.allowFullscreen = true;
+    ifrmContainer.style.border = "none";
+    ifrm.style.width = "24em";
+    ifrm.style.height = "90%";
+    ifrm.style.border = "none";
     ifrm.allowFullscreen = true;
     ifrm.style.position = "fixed";
-    ifrm.style.top = "0px";
+    ifrm.style.top = "50%";
     ifrm.style.left = "0px";
-    ifrm.style.bottom = "0px";
     ifrm.style.right = "0px";
     ifrm.style.overflow = "unset";
     ifrm.style.zIndex = "9999999999";
-  } else {
-    console.log("Desktop view not supported");
+    ifrm.style.margin = "0 auto";
+    ifrm.style.display = "absolute";
+    ifrm.style.borderRadius = "10px";
+    ifrm.style.transform = "translateY(-50%)";
+    growwxContainer.appendChild(ifrmContainer);
   }
-  document.body.appendChild(ifrm);
+  growwxContainer.appendChild(ifrm);
+  document.body.appendChild(growwxContainer);
   document.body.style.overflow = "hidden";
   window.addEventListener("message", function (e) {
     if (e.data && e.data.event === "unload-iframe") {
-      var iframe = document.getElementById("growwx-iframe");
-      iframe.parentNode.removeChild(iframe);
+      var iframe = document.getElementById("growwx-container");
       document.body.style.overflow = "auto";
+      // iframe.parentNode.removeChild(iframe);
+      // growwxContainer.removeChild(ifrmContainer);
+      // growwxContainer.removeChild(ifrm);
+      document.body.removeChild(growwxContainer);
     }
     if (e.data && e.data.event === "navigate") {
       this.window.location.replace(e.data.location);
+      console.log(e.data.location);
+      if (e.data.location.includes("http")) {
+        console.log(e.data.location);
+        clearCart();
+      }
+
     }
     if (e.data && e.data.event === "setItem") {
       this.localStorage.setItem(e.data.key, e.data.value);
@@ -43,6 +91,7 @@ function triggerCheckout(payload, gamma) {
 
 function publishLocalStorage() {
   console.log("publishLocalStorage");
+  setCookiesInLocalStorage()
   var localStorageMap = {};
   for (var i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
@@ -53,6 +102,25 @@ function publishLocalStorage() {
     { event: "storageSync", dataMap: localStorageMap },
     "*"
   );
+}
+
+function setCookiesInLocalStorage() {
+  // localStorage.setItem("_shopify_sa_p", "fbclid%3DPAAaYcp30odM6EpJZITSWfMlqTXp55CayIKGnpI-IAfj9pEGFK2k9gjfn3T6M_aem_AfcZ2ntkmw0fo-OxYWLTdXf6W_Kg2hKSqJePO6raf-zodZg6v0ciZ__idIYTXUAQJlrvQ3Ni6NC20qTxsgz3oCglBMO1ZlGNQtF9Vq6TvLS_p_vASbb-0_darLycsopLSx8")
+  // localStorage.setItem("_landing_page", "%2Fproducts%2Fspinbot-battlebudz-gx10-gaming-bluetooth-tws-earbuds-with-low-latency-and-game-mode%3Ffbclid%3DPAAaYcp30odM6EpJZITSWfMlqTXp55CayIKGnpI-IAfj9pEGFK2k9gjfn3T6M_aem_AfcZ2ntkmw0fo-OxYWLTdXf6W_Kg2hKSqJePO6raf-zodZg6v0ciZ__idIYTXUAQJlrvQ3Ni6NC20qTxsgz3oCglBMO1ZlGNQtF9Vq6TvLS_p_vASbb-0_darLycsopLSx8")
+  // localStorage.setItem("_landing_page", "%2Fproducts%2Fspinbot-battlebudz-gx10-gaming-bluetooth-tws-earbuds-with-low-latency-and-game-mode")
+  // localStorage.setItem("_landing_page", "%2Fproducts%2Fspinbot-battlebudz-gx10-gaming-bluetooth-tws-earbuds-with-low-latency-and-game-mode?utm_campaign=blog_post&utm_medium=social&utm_source=facebook")
+  cookie =  "_shopify_sa_p=fbclid%3DPAAaYcp30odM6EpJZITSWfMlqTXp55CayIKGnpI-IAfj9pEGFK2k9gjfn3T6M_aem_AfcZ2ntkmw0fo-OxYWLTdXf6W_Kg2hKSqJePO6raf-zodZg6v0ciZ__idIYTXUAQJlrvQ3Ni6NC20qTxsgz3oCglBMO1ZlGNQtF9Vq6TvLS_p_vASbb-0_darLycsopLSx8; path=/; domain=example.com; expires=Wed, 18 Apr 2024 00:00:00 UTC";
+  console.log("cookies", cookie)
+  const pairs = cookie.split("; ");
+  for (let i = 0; i < pairs.length; i++) {
+    const pair = pairs[i].split("=");
+    const key = pair[0];
+    const value = decodeURIComponent(pair[1]);
+    if(key === "_shopify_sa_p" || key === "_landing_page"){
+        localStorage.setItem(key, value);
+    }
+  }
+
 }
 
 function isMobile() {
@@ -86,6 +154,10 @@ const payloadSpinBot = "eyJjYXJ0Ijp7InRvdGFsX3ByaWNlIjoxODk5LCJ0b3RhbF9kaXNjb3Vu
 const payloadAartyDiscount = "ewogICAgImNhcnQiOiB7CiAgICAgICAgInRvdGFsX3ByaWNlIjogMzgwMywKICAgICAgICAidG90YWxfZGlzY291bnQiOiAyMDAsCiAgICAgICAgIml0ZW1fY291bnQiOiAzLAogICAgICAgICJpdGVtcyI6IFsKICAgICAgICAgICAgewogICAgICAgICAgICAgICAgImlkIjogNDM2NTAxNDA4OTc1MDIsCiAgICAgICAgICAgICAgICAicXVhbnRpdHkiOiAxLAogICAgICAgICAgICAgICAgInZhcmlhbnRfaWQiOiA0MzY1MDE0MDg5NzUwMiwKICAgICAgICAgICAgICAgICJ0aXRsZSI6ICJFbGVnYW50ZSBSb3lhbCBwbGFudGVyIiwKICAgICAgICAgICAgICAgICJwcmljZSI6IDM5OTksCiAgICAgICAgICAgICAgICAib3JpZ2luYWxfcHJpY2UiOiAzOTk5LAogICAgICAgICAgICAgICAgImRpc2NvdW50ZWRfcHJpY2UiOiAzNzk5LjE5LAogICAgICAgICAgICAgICAgInRvdGFsX2Rpc2NvdW50IjogMCwKICAgICAgICAgICAgICAgICJkaXNjb3VudHMiOiBbXSwKICAgICAgICAgICAgICAgICJza3UiOiAiMyIsCiAgICAgICAgICAgICAgICAiZ3JhbXMiOiAwLAogICAgICAgICAgICAgICAgInVybCI6ICJodHRwczovL2Nkbi5zaG9waWZ5LmNvbS9zL2ZpbGVzLzEvMDY2NC8xNTE2LzU2NjIvcHJvZHVjdHMvaW1hZ2UtNy5qcGc/dj0xNjY4MzU1ODI2IiwKICAgICAgICAgICAgICAgICJpbWFnZSI6ICJodHRwczovL2Nkbi5zaG9waWZ5LmNvbS9zL2ZpbGVzLzEvMDY2NC8xNTE2LzU2NjIvcHJvZHVjdHMvaW1hZ2UtNy5qcGc/dj0xNjY4MzU1ODI2IgogICAgICAgICAgICB9LAogICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAiaWQiOiA0MzgyNTAxMDgwMjkxMCwKICAgICAgICAgICAgICAgICJxdWFudGl0eSI6IDIsCiAgICAgICAgICAgICAgICAidmFyaWFudF9pZCI6IDQzODI1MDEwODAyOTEwLAogICAgICAgICAgICAgICAgInRpdGxlIjogIlB1cnBsZSBGbG93ZXIiLAogICAgICAgICAgICAgICAgInByaWNlIjogMiwKICAgICAgICAgICAgICAgICJvcmlnaW5hbF9wcmljZSI6IDIsCiAgICAgICAgICAgICAgICAiZGlzY291bnRlZF9wcmljZSI6IDEuOTEsCiAgICAgICAgICAgICAgICAidG90YWxfZGlzY291bnQiOiAwLAogICAgICAgICAgICAgICAgImRpc2NvdW50cyI6IFtdLAogICAgICAgICAgICAgICAgInNrdSI6ICIiLAogICAgICAgICAgICAgICAgImdyYW1zIjogMTAwLAogICAgICAgICAgICAgICAgInVybCI6ICJodHRwczovL2Nkbi5zaG9waWZ5LmNvbS9zL2ZpbGVzLzEvMDY2NC8xNTE2LzU2NjIvcHJvZHVjdHMvcHVycGxlLW9zdGVvc3Blcm11bS1kYWlzeS1mbG93ZXJfMTM3My0xNi53ZWJwP3Y9MTY3MjMyMTg1MiIsCiAgICAgICAgICAgICAgICAiaW1hZ2UiOiAiaHR0cHM6Ly9jZG4uc2hvcGlmeS5jb20vcy9maWxlcy8xLzA2NjQvMTUxNi81NjYyL3Byb2R1Y3RzL3B1cnBsZS1vc3Rlb3NwZXJtdW0tZGFpc3ktZmxvd2VyXzEzNzMtMTYud2VicD92PTE2NzIzMjE4NTIiCiAgICAgICAgICAgIH0KICAgICAgICBdLAogICAgICAgICJyZXF1aXJlc19zaGlwcGluZyI6IHRydWUsCiAgICAgICAgImN1cnJlbmN5IjogIklOUiIsCiAgICAgICAgIml0ZW1zX3N1YnRvdGFsX3ByaWNlIjogMzgwMywKICAgICAgICAiY2FydF9sZXZlbF9kaXNjb3VudF9hcHBsaWNhdGlvbnMiOiBbXQogICAgfSwKICAgICJtaWQiOiAiNjE4OTRiNmMtMTU4NC00ZjIyLTgxYjktOTU3YzBlODUwNGMzIgp9"
 const payloadFlaars = "eyJjYXJ0Ijp7InRvdGFsX3ByaWNlIjozMDAwLCJ0b3RhbF9kaXNjb3VudCI6MCwiaXRlbV9jb3VudCI6MSwiaXRlbXMiOlt7ImlkIjoiNzk4MTc1NTM2NzY0NiIsInF1YW50aXR5IjoxLCJ2YXJpYW50X2lkIjoiNDQwODA5ODkwNDQ5NTgiLCJ0aXRsZSI6IkxlaGVyaXlhIENoaWZmb24gU2FyZWUgd2l0aCBCbG91c2UgUGllY2UiLCJwcmljZSI6MzAwMCwib3JpZ2luYWxfcHJpY2UiOjMwMDAsImRpc2NvdW50ZWRfcHJpY2UiOjMwMDAsInRvdGFsX2Rpc2NvdW50IjowLCJkaXNjb3VudHMiOltdLCJza3UiOiI4OTA0MTMwODk3OTU1IiwidXJsIjoiL3Byb2R1Y3RzL2xlaGVyaXlhLWNoaWZmb24tc2FyZWUtd2l0aC1ibG91c2UtcGllY2UiLCJpbWFnZSI6Imh0dHBzOi8vY2RuLnNob3BpZnkuY29tL3MvZmlsZXMvMS8wNjY0LzE1MTYvNTY2Mi9wcm9kdWN0cy9sZWhlcml5YS1wcmludGVkLWNoaWZmb24tc2FyZWUtaW4tdGVhbC1ncmVlbi12MS1za2szMTA4NC53ZWJwIn1dLCJyZXF1aXJlc19zaGlwcGluZyI6dHJ1ZSwiY3VycmVuY3kiOiJJTlIiLCJpdGVtc19zdWJ0b3RhbF9wcmljZSI6MzAwMCwiY2FydF9sZXZlbF9kaXNjb3VudF9hcHBsaWNhdGlvbnMiOltdfSwibWlkIjoiNjE4OTRiNmMtMTU4NC00ZjIyLTgxYjktOTU3YzBlODUwNGMzIn0="
 
+
+
+const payloadLuxuryKase = "eyJjYXJ0Ijp7InRvdGFsX3ByaWNlIjo1NDksInRvdGFsX2Rpc2NvdW50IjowLCJpdGVtX2NvdW50IjoxLCJpdGVtcyI6W3siaWQiOiIiLCJxdWFudGl0eSI6MSwidmFyaWFudF9pZCI6IjQxNTQxMzQzNzcyNzcyIiwidGl0bGUiOiJMdXh1cnlLYXNlIE1hdHRlIExhc2VyIEdyYWRpZW50IENsZWFyIFBob25lIENhc2UgRm9yIGlQaG9uZSAxMSAxMiAxMyAxNCBQbHVzIE1pbmkgUHJvIE1heCIsInByaWNlIjo1NDksIm9yaWdpbmFsX3ByaWNlIjo1NDksImRpc2NvdW50ZWRfcHJpY2UiOjU0OSwidG90YWxfZGlzY291bnQiOjAsImRpc2NvdW50cyI6W10sInNrdSI6Im51bGwiLCJ1cmwiOiIvcHJvZHVjdHMvbHV4dXJ5a2FzZS1tYXR0ZS1sYXNlci1ncmFkaWVudC1jbGVhci1waG9uZS1jYXNlLWZvci1pcGhvbmUtMTEtMTItMTMtMTQtcGx1cy1taW5pLXByby1tYXgiLCJpbWFnZSI6Imh0dHBzOi8vY2RuLnNob3BpZnkuY29tL3MvZmlsZXMvMS8wNTUyLzI5NzcvNTk3Mi9wcm9kdWN0cy8xX2NkNGViN2FhLWUzZGUtNGRlOS1iYjRiLTY1NzVjNDk2OWJjMi5qcGcifV0sInJlcXVpcmVzX3NoaXBwaW5nIjp0cnVlLCJjdXJyZW5jeSI6IklOUiIsIml0ZW1zX3N1YnRvdGFsX3ByaWNlIjo1NDksImNhcnRfbGV2ZWxfZGlzY291bnRfYXBwbGljYXRpb25zIjpbXX0sIm1pZCI6ImY0MTg1ZmVhLWFjNDQtNDg4ZS1iNDcxLTYzMmRkZmNmMDBmYiIsImluZ3Jlc3NUaW1lIjoxNjgyMDY1NzQwNzEyLCJpbmdyZXNzV29ya2Zsb3ciOiJCVVlfTk9XIiwidXNlclNlc3Npb25JZCI6ImRlNTkwMTk3LTVhYzctNDNiNy1iZGY3LWE0MzExNjkwN2QzNyJ9"
+
 function checkoutOnFlaars(){
   triggerCheckout(payloadFlaars, false)
 }
@@ -102,10 +174,23 @@ function checkoutOnSpinBot(){
   triggerCheckout(payloadSpinBot, false)
 }
 
+function checkoutOnSpinBotGamma(){
+  triggerCheckout(payloadSpinBot, true)
+}
+
+function checkoutOnLuxuryKase(){
+  triggerCheckout(payloadLuxuryKase)
+}
+
+function checkoutOnLuxuryKaseGamma(){
+  triggerCheckout(payloadLuxuryKase, true)
+}
+
 
 function getIframeUrl(payload, gamma) {
   // const PROD_MASTER = "https://master.d1x4zgp7l0n0ny.amplifyapp.com"
-  const DEVELOPMENT = "https://development.dsa2svnq8e9eh.amplifyapp.com" // this is pointing to gamma
+  // const DEVELOPMENT = "https://development.dsa2svnq8e9eh.amplifyapp.com" // this is pointing to gamma
+  const DEVELOPMENT = "https://development.d1x4zgp7l0n0ny.amplifyapp.com" // this is pointing to gamma
   // const GAMMA = "https://dev-shahaab.d1x4zgp7l0n0ny.amplifyapp.com"
   const LOCALHOST = "http://localhost:3000"
   var HOST = LOCALHOST;
