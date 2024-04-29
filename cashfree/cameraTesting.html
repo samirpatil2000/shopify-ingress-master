@@ -11,6 +11,17 @@
             align-items: center;
             height: 100vh;
             margin: 0;
+            font-family: Arial, sans-serif; /* Specify a fallback font */
+            background-color: #f3f3f3; /* Light gray background */
+            flex-direction: column;
+        }
+
+        .video-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
         }
 
         .video-container {
@@ -19,7 +30,7 @@
             border: 2px solid #ccc;
             border-radius: 5px;
             overflow: hidden;
-            max-width: 100%; /* Ensure video container is not wider than the viewport */
+            max-width: calc(50% - 20px); /* Ensure video container is not wider than 50% of the viewport */
         }
 
         video {
@@ -27,25 +38,48 @@
             height: 100%;
             object-fit: cover; /* Ensure video fills container */
         }
+
+        h2 {
+            margin: 0;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+        }
+
+        h3 {
+            margin: 0;
+            padding: 10px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        
     </style>
 </head>
 <body>
-    <div class="video-container">
-        <h2 id="label-videoElement1"></h2>
-        <video id="videoElement1" autoplay></video>
+    <div class="video-box">
+        <div class="video-container">
+            <h2 id="label-videoElement1">Environment</h2>
+            <video id="videoElement1" autoplay></video>
+        </div>
+    
+        <div class="video-container">
+            <h2 id="label-videoElement2">User</h2>
+            <video id="videoElement2" autoplay></video>
+        </div>
     </div>
-
-    <div class="video-container">
-        <h2 id="label-videoElement2"></h2>
-        <video id="videoElement2" autoplay></video>
-    </div>
+    <h3 id="list">List of Devices:</h3>
 
     <script>
         async function setupVideoStream(videoElementId, facingMode) {
             try {
                 const videoElement = document.getElementById(videoElementId);
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facingMode } });
-                document.getElementById(`label-${videoElementId}`).textContent = facingMode
+                document.getElementById(`label-${videoElementId}`).textContent = facingMode;
                 videoElement.srcObject = stream;
             } catch (error) {
                 console.error('Error accessing media devices: ', error);
@@ -55,6 +89,12 @@
         document.addEventListener('DOMContentLoaded', () => {
             setupVideoStream("videoElement1", 'environment');
             setupVideoStream("videoElement2", 'user');
+            navigator.mediaDevices.enumerateDevices().then((devices) => {
+                const videoDevices = devices.filter(device => device.kind === 'videoinput');
+                console.log({videoDevices});
+                const listElement = document.getElementById("list");
+                listElement.textContent = "List of Devices: " + videoDevices.length;
+            });
         });
     </script>
 </body>
