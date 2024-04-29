@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Containers</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .video-container {
+            flex: 1;
+            margin: 10px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+            max-width: 100%; /* Ensure video container is not wider than the viewport */
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensure video fills container */
+        }
+    </style>
+</head>
+<body>
+    <div class="video-container">
+        <h2 id="label-videoElement1"></h2>
+        <video id="videoElement1" autoplay></video>
+    </div>
+
+    <div class="video-container">
+        <h2 id="label-videoElement2"></h2>
+        <video id="videoElement2" autoplay></video>
+    </div>
+
+    <script>
+        async function setupVideoStream(videoElementId, facingMode) {
+            try {
+                const videoElement = document.getElementById(videoElementId);
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facingMode } });
+                document.getElementById(`label-${videoElementId}`).textContent = facingMode
+                videoElement.srcObject = stream;
+            } catch (error) {
+                console.error('Error accessing media devices: ', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setupVideoStream("videoElement1", 'environment');
+            setupVideoStream("videoElement2", 'user');
+        });
+    </script>
+</body>
+</html>
