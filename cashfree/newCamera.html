@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Containers</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif; /* Specify a fallback font */
+            background-color: #f3f3f3; /* Light gray background */
+            flex-direction: column;
+        }
+
+        .video-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .video-container {
+            flex: 1;
+            margin: 10px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+            max-width: calc(50% - 20px); /* Ensure video container is not wider than 50% of the viewport */
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensure video fills container */
+        }
+
+        h2 {
+            margin: 0;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+        }
+
+        h3 {
+            margin: 0;
+            padding: 10px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<div class="video-box">
+    <div class="video-container">
+        <h2 id="label-videoElement1">Environment</h2>
+        <video id="videoElement" autoplay></video>
+    </div>
+
+</div>
+<div style="display: flex; flex-direction: row">
+    <button id="startStreaming">Start Streaming</button>
+    <button id="switch">Switch Camera</button>
+</div>
+
+<h3 id="list">List of Devices:</h3>
+<h3 id="list2">Video Devices:</h3>
+
+<script>
+    const videoElement = document.getElementById('videoElement');
+    const labelElement = document.getElementById('label-videoElement1');
+    const listElement = document.getElementById('list');
+    const switchButton = document.getElementById('switch');
+    const startButton = document.getElementById('startStreaming');
+
+    const constraints = {
+        video: {
+            facingMode: 'environment'
+        }
+    };
+
+    let currentStream;
+
+    // Function to switch camera
+    async function switchCamera() {
+        if (currentStream) {
+            currentStream.getTracks().forEach(track => track.stop());
+        }
+        try {
+            const {facingMode} = constraints.video;
+            constraints.video.facingMode = facingMode === 'user' ? 'environment' : 'user';
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            labelElement.innerHTML = `Facing Mode - ${constraints.video.facingMode}`;
+
+            currentStream = stream;
+            videoElement.srcObject = stream;
+        } catch (error) {
+            console.error('Error switching camera:', error);
+        }
+    }
+
+    switchButton.addEventListener('click', switchCamera);
+
+    async function startStreaming() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({video: {facingMode: 'environment'}});
+            labelElement.innerHTML = `Facing Mode - ${constraints.video.facingMode}`;
+
+            currentStream = stream;
+            videoElement.srcObject = stream;
+        } catch (error) {
+            console.error('Error starting streaming:', error);
+        }
+    }
+
+    startButton.addEventListener('click', () => {
+        if (!currentStream) {
+            startStreaming();
+            startButton.textContent = "Stop Streaming";
+        } else {
+            currentStream.getTracks().forEach(track => track.stop());
+            currentStream = null;
+            startButton.textContent = "Start Streaming";
+        }
+    });
+
+    // Function to list devices
+    navigator.mediaDevices.enumerateDevices()
+        .then(devices => {
+            devices.forEach((device, index) => {
+                console.log(device.kind.toUpperCase(), device.label, {device});
+                listElement.innerHTML += ` ${index + 1}. ${device.kind.toUpperCase()} - ${device.label} , `;
+            });
+        })
+        .catch(err => {
+            console.log(err.name, err.message);
+        });
+
+    // Function to list devices
+    navigator.mediaDevices.enumerateDevices()
+        .then(devices => {
+            const len = devices.filter(device => device.kind.toLowerCase() === 'videoinput').length;
+            document.getElementById("list2").innerHTML = `Video Devices: ${len}`;
+        })
+
+</script>
+</body>
+</html>
